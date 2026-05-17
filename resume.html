@@ -70,29 +70,27 @@
             margin-bottom: 5px;
             display: flex;
             justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-right p i {
+            color: var(--primary-blue);
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
         }
 
         .contact-link {
             color: var(--primary-blue);
             text-decoration: underline;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
             font-size: 16px;
             transition: all 0.2s;
+            display: inline;
         }
 
         .contact-link:hover {
             color: #123052;
-        }
-
-        .contact-link i {
-            color: var(--primary-blue);
-            font-size: 14px;
-            width: 20px;
-            text-align: center;
-            text-decoration: none !important;
-            display: inline-block;
         }
 
         /* Sections */
@@ -340,7 +338,7 @@
                 display: inline !important;
             }
 
-            .contact-link i {
+            .header-right p i {
                 color: #0000EE !important;
                 margin-right: 5px !important;
                 display: inline !important;
@@ -369,12 +367,9 @@
                     <p class="title">Python Developer</p>
                 </div>
                 <div class="header-right">
-                    <p><a href="mailto:suxrob.77.zzz@gmail.com" class="contact-link"><i class="fas fa-envelope"></i>
-                            Email: suxrob.77.zzz@gmail.com</a></p>
-                    <p><a href="tel:+998913202412" class="contact-link"><i class="fas fa-phone"></i> Tel: +998 91
-                            320-24-12</a></p>
-                    <p><a href="https://github.com/CR7Suxrob" target="_blank" class="contact-link"><i
-                                class="fab fa-github"></i> github.com/CR7Suxrob</a></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:suxrob.77.zzz@gmail.com" class="contact-link">Email: suxrob.77.zzz@gmail.com</a></p>
+                    <p><i class="fas fa-phone"></i> <a href="tel:+998913202412" class="contact-link">Tel: +998 91 320-24-12</a></p>
+                    <p><i class="fab fa-github"></i> <a href="https://github.com/CR7Suxrob" target="_blank" class="contact-link">github.com/CR7Suxrob</a></p>
                 </div>
             </header>
 
