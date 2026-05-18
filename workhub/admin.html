@@ -27,6 +27,27 @@ body {
     min-height: 100vh;
     transition: 0.3s;
     overflow-x: hidden;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #00d2ff, #bc13fe, #00d2ff);
+    background-size: 200% auto;
+    z-index: 99999;
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.6);
+    animation: glow-bar-anim 5s linear infinite;
+}
+
+@keyframes glow-bar-anim {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Glassmorphism Background */
@@ -289,6 +310,33 @@ td {
     background: var(--accent);
     color: white;
 }
+
+/* Light Mode Styles */
+body.light-mode {
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --border: rgba(0, 0, 0, 0.1);
+    --text: #1a1a1a;
+    --muted: #606060;
+    --accent-glow: rgba(188, 19, 254, 0.15);
+}
+body.light-mode .topbar {
+    background: rgba(255, 255, 255, 0.9);
+}
+body.light-mode #login-screen {
+    background: radial-gradient(circle at center, #ffffff 0%, #f4f6f8 100%);
+}
+body.light-mode .login-box input {
+    background: #f0f0f0;
+    color: #1a1a1a;
+}
+body.light-mode .ctrl-btn {
+    background: #ffffff;
+    color: #1a1a1a;
+}
+body.light-mode th {
+    background: rgba(0,0,0,0.02);
+}
 </style>
 </head>
 <body>
@@ -489,6 +537,9 @@ function removeItem(id) {
 }
 
 // Default to UZ translations
+if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+}
 changeLang('uz');
 </script>
 </body>

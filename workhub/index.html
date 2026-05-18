@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Hub | Enterprise Console</title>
-    <link rel="stylesheet" href="style.css?v=11.0">
+    <link rel="stylesheet" href="style.css?v=12.0">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#bc13fe">
     
@@ -20,7 +20,7 @@
         .category-title {
             font-family: var(--font-h);
             font-size: 1.4rem;
-            color: white;
+            color: var(--text);
             margin: 3rem 0 1.5rem;
             display: flex;
             align-items: center;
@@ -37,7 +37,7 @@
         .back-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border);
-            color: white;
+            color: var(--text);
             padding: 0.6rem 1.2rem;
             border-radius: 10px;
             cursor: pointer;
@@ -52,6 +52,70 @@
             background: var(--accent-light);
             border-color: var(--accent);
         }
+        /* Redis Toast Notifications */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .redis-toast {
+            background: rgba(20, 20, 40, 0.95);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            min-width: 280px;
+            max-width: 380px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(188, 19, 254, 0.15);
+        }
+        .redis-toast.show { transform: translateX(0); }
+        .toast-title { font-weight: 700; font-size: 0.9rem; color: var(--text); margin-bottom: 4px; }
+        .toast-text { font-size: 0.8rem; color: var(--text-dim); }
+
+        /* Redis Status Indicator */
+        #redis-status {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 9999;
+            transition: opacity 0.5s;
+            opacity: 0;
+        }
+        #redis-status.connected { background: rgba(0, 179, 110, 0.15); color: #00b36e; border: 1px solid rgba(0, 179, 110, 0.3); }
+        #redis-status.disconnected { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.3); }
+
+        /* Redis Monitor Panel */
+        .redis-stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .redis-stat-card small { color: var(--text-dim); font-size: 0.7rem; font-weight: 600; }
+        .redis-stat-card h4 { margin: 0; color: var(--text); }
+        .redis-stat-icon { font-size: 1.5rem; }
+        .redis-queue-stat {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem;
+            text-align: center;
+        }
+        .redis-queue-stat small { color: var(--text-dim); font-size: 0.65rem; display: block; margin-bottom: 4px; }
+        .redis-queue-stat b { font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -71,6 +135,7 @@
             <a href="#" class="nav-link active" data-target="overview">
                 <span class="icon">📊</span> Dashboard
             </a>
+
             <a href="#" class="nav-link" data-target="services">
                 <span class="icon">📈</span> Xizmatlar
             </a>
@@ -117,8 +182,8 @@
             <a href="#" class="nav-link" data-target="settings">
                 <span class="icon">⚙️</span> Sozlamalar
             </a>
-            <a href="admin.html" class="nav-link-admin" style="text-decoration:none; color:var(--text-dim); padding:1rem 1.5rem; display:flex; align-items:center; gap:1rem;">
-                <span class="icon">🔒</span> Admin Panel
+            <a href="#" class="nav-link" onclick="event.preventDefault(); openRedisMonitor()">
+                <span class="icon">🗄️</span> Redis Monitor
             </a>
         </nav>
 
@@ -146,10 +211,11 @@
             </div>
             <div class="top-controls">
                 <div class="lang-selector">
-                    <span onclick="changeLanguage('uz')" class="lang-item active" id="lang-uz">Uzbek</span>
-                    <span onclick="changeLanguage('ru')" class="lang-item" id="lang-ru">Rus</span>
-                    <span onclick="changeLanguage('en')" class="lang-item" id="lang-en">Ingliz</span>
+                    <span onclick="changeLanguage('uz')" class="lang-item active" id="lang-uz">UZ</span>
+                    <span onclick="changeLanguage('ru')" class="lang-item" id="lang-ru">RU</span>
+                    <span onclick="changeLanguage('en')" class="lang-item" id="lang-en">EN</span>
                 </div>
+                <a href="admin.html" class="admin-panel-btn" title="Admin Panel">🔒 Admin</a>
                 <div class="ctrl-icon" id="theme-toggle" title="Mavzuni o'zgartirish">🌙</div>
                 <div class="ctrl-icon">🔔</div>
                 <div class="ctrl-icon">⚙️</div>
@@ -904,6 +970,7 @@
             });
         }
     </script>
-    <script src="app.js?v=11.0"></script>
+    <script src="redis-client.js?v=1.0"></script>
+    <script src="app.js?v=13.0"></script>
 </body>
 </html>

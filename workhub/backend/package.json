@@ -1,0 +1,21 @@
+{
+  "name": "workhub-backend",
+  "version": "1.0.0",
+  "description": "WorkHub Backend with Redis - Cache, Sessions, Queues, Real-time",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ioredis": "^5.3.2",
+    "express-session": "^1.17.3",
+    "connect-redis": "^7.1.0",
+    "socket.io": "^4.7.2",
+    "bullmq": "^4.12.0",
+    "node-fetch": "^2.7.0"
+  }
+}

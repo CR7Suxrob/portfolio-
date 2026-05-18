@@ -77,12 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- NAVIGATION LOGIC ---
-    const navLinks = document.querySelectorAll('.nav-link');
-    const sections = document.querySelectorAll('.view-section');
-
     window.switchView = function(target) {
-        // Update active link
-        navLinks.forEach(link => {
+        if (!target) return;
+
+        // Update active link - re-query every time
+        document.querySelectorAll('.nav-link').forEach(link => {
             if (link.getAttribute('data-target') === target) {
                 link.classList.add('active');
             } else {
@@ -90,39 +89,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Show target section
-        sections.forEach(sec => {
-            if (sec.id === `view-${target}`) {
-                sec.style.display = 'block';
-            } else {
-                sec.style.display = 'none';
-            }
+        // Show/hide sections - re-query every time
+        document.querySelectorAll('.view-section').forEach(sec => {
+            sec.style.display = (sec.id === `view-${target}`) ? 'block' : 'none';
         });
 
-        // UNIVERSAL SIDEBAR HIDE (Desktop & Mobile)
-        const sidebar = document.querySelector('.dashboard-sidebar');
-        if (sidebar) {
-            sidebar.classList.add('collapsed'); // Desktop & Mobile logic
-            sidebar.classList.remove('active'); // Old mobile logic
-        }
-
-        // Scroll to top of content
+        // Scroll to top
         const mainContent = document.getElementById('main-content');
         if (mainContent) mainContent.scrollTop = 0;
         window.scrollTo(0, 0);
 
-        // Close sidebar on mobile
+        // Close sidebar only on mobile
         if (window.innerWidth <= 850) {
             const sidebar = document.querySelector('.dashboard-sidebar');
-            if (sidebar) sidebar.classList.remove('active');
+            if (sidebar) {
+                sidebar.classList.remove('active');
+            }
         }
     }
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+    // Attach click listeners to nav links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
             e.preventDefault();
-            switchView(link.getAttribute('data-target'));
+            const target = this.getAttribute('data-target');
+            if (target) switchView(target);
         });
+    });
+
+    // --- SIDEBAR TOGGLE (☰ button) ---
+    window.toggleSidebar = function() {
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (!sidebar) return;
+        if (window.innerWidth <= 850) {
+            sidebar.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+        }
+    }
+
+    // Close sidebar on outside click (mobile only)
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth > 850) return;
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const toggle = document.getElementById('menu-toggle');
+        if (sidebar && !sidebar.contains(e.target) && toggle && !toggle.contains(e.target)) {
+            sidebar.classList.remove('active');
+        }
     });
 
     // --- BUTTON HANDLERS ---
@@ -160,17 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.innerHTML = 'YUBORILMOQDA...';
             submitBtn.disabled = true;
 
-            const telegramMessage = `💼 *WORK HUB: NEW INQUIRY*\n\n👤 *Ism:* ${name}\n📞 *Tel:* ${phone}\n🛠️ *Xizmat:* ${service}\n💬 *Xabar:* ${msg || 'Yo\'q'}\n\n_Sent via Enterprise Console_`;
-
             try {
-                // Send to Telegram
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: CHAT_ID, text: telegramMessage, parse_mode: 'Markdown' }),
-                });
+                // Try backend API first (Redis + Background Queue)
+                if (window.WorkHubAPI) {
+                    const result = await WorkHubAPI.createOrder({ name, phone, service, message: msg });
+                    if (result && result.success) {
+                        console.log('✅ Order saved via Redis backend');
+                    }
+                }
 
-                // Save to LocalStorage
+                // Also save to LocalStorage as fallback
                 const orders = JSON.parse(localStorage.getItem('workhub_orders') || '[]');
                 orders.push({ id: Date.now(), name, phone, service, message: msg, date: new Date().toISOString() });
                 localStorage.setItem('workhub_orders', JSON.stringify(orders));
@@ -544,16 +556,15 @@ window.sendChatMsg = function() {
     input.value = '';
     chatBody.scrollTop = chatBody.scrollHeight;
 
-    // Send to Telegram
-    const BOT_TOKEN = '8469015792:AAHer6z93IlMyN_hF-1LPJdmMTcD3Zw77p4';
-    const CHAT_ID = '1198878759';
-    const telegramMessage = `💬 *WORK HUB: NEW CHAT MESSAGE*\n\n💬 *Xabar:* ${msg}\n\n_Sent via Live Chat_`;
-
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT_ID, text: telegramMessage, parse_mode: 'Markdown' }),
-    }).catch(err => console.error('Telegram Chat Error:', err));
+    // Send via Backend API (Redis Queue)
+    if (window.WorkHubAPI) {
+        WorkHubAPI.sendChat(msg)
+            .then(() => console.log('Chat sent via Redis queue'))
+            .catch(err => console.error('Chat error:', err));
+    } else {
+        console.warn('Backend serverga ulanilmagan');
+        alert("Server bilan aloqa yo'q! Xabarni jo'natib bo'lmaydi.");
+    }
 
     setTimeout(() => {
         const botDiv = document.createElement('div');
