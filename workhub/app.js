@@ -212,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     if (localStorage.getItem('theme') === 'light') {
         document.body.classList.add('light-mode');
-        if (themeToggle) themeToggle.innerText = '☀️';
     }
 
     if (themeToggle) {
@@ -220,10 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.toggle('light-mode');
             if (document.body.classList.contains('light-mode')) {
                 localStorage.setItem('theme', 'light');
-                themeToggle.innerText = '☀️';
             } else {
                 localStorage.setItem('theme', 'dark');
-                themeToggle.innerText = '🌙';
             }
         });
     }
